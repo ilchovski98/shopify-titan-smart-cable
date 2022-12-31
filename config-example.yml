@@ -1,7 +1,7 @@
 development:
   password: PASSWORD_HERE
   theme_id: THEME_ID_HERE
-  store: nikola-ilchovski.myshopify.com
+  store: https://nikola-ilchovski.myshopify.com
   directory: ./shopify/
   ignore_files:
     - config/settings_data.json

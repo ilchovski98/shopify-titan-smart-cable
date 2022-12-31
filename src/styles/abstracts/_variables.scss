@@ -1,0 +1,15 @@
+/* ------------------------------------------------------------ *\
+  Variables
+\* ------------------------------------------------------------ */
+
+$responsive-xxs: 480px;
+$responsive-xs: 767px;
+$responsive-sm-landscape: 812px;
+$responsive-sm: 1024px;
+$responsive-md: 1200px;
+
+$mobile-small: '(max-width: #{$responsive-xxs}) ';
+$mobile: '(max-width: #{$responsive-xs}), screen and (max-width: #{$responsive-sm-landscape}) and (orientation: landscape) ';
+$tablet-portrait: '(max-width: #{$responsive-sm}) ';
+$small-desktop: '(max-width: #{$responsive-md}) ';
+$retina: '(min-resolution: 2dppx) ';
