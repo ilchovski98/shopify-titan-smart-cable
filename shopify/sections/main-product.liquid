@@ -1,17 +1,18 @@
+{{ 'section-main-product.css' | asset_url | stylesheet_tag }}
+{{ 'component-accordion.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-rte.css' | asset_url | stylesheet_tag }}
+{{ 'component-slider.css' | asset_url | stylesheet_tag }}
+{{ 'component-rating.css' | asset_url | stylesheet_tag }}
+{{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
+{{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
+{{ 'component-shell.css' | asset_url | stylesheet_tag }}
+
 <section
   id="MainProduct-{{ section.id }}"
-  class="page-width section-{{ section.id }}-padding"
+  class="shell section-{{ section.id }}-padding"
   data-section="{{ section.id }}"
 >
-  {{ 'section-main-product.css' | asset_url | stylesheet_tag }}
-  {{ 'component-accordion.css' | asset_url | stylesheet_tag }}
-  {{ 'component-price.css' | asset_url | stylesheet_tag }}
-  {{ 'component-rte.css' | asset_url | stylesheet_tag }}
-  {{ 'component-slider.css' | asset_url | stylesheet_tag }}
-  {{ 'component-rating.css' | asset_url | stylesheet_tag }}
-  {{ 'component-loading-overlay.css' | asset_url | stylesheet_tag }}
-  {{ 'component-deferred-media.css' | asset_url | stylesheet_tag }}
-
   {%- style -%}
     .section-{{ section.id }}-padding {
       padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
@@ -48,7 +49,7 @@
   {%- endif -%}
 
   <div class="product product--{{ section.settings.media_size }} product--{{ section.settings.media_position }} product--{{ section.settings.gallery_layout }} product--mobile-{{ section.settings.mobile_thumbnails }} grid grid--1-col {% if product.media.size > 0 %}grid--2-col-tablet{% else %}product--no-media{% endif %}">
-    <div class="grid__item product__media-wrapper{% if section.settings.media_position == 'right' %} medium-hide large-up-hide{% endif %}">
+    <div class="grid__item product__media-wrapper{% if section.settings.media_position == 'right' %} medium-hide large-up-hide{% endif %} js-animate slide-left">
       <media-gallery
         id="MediaGallery-{{ section.id }}"
         role="region"
@@ -305,7 +306,7 @@
         {%- endif -%}
       </media-gallery>
     </div>
-    <div class="product__info-wrapper grid__item{% if settings.page_width > 1400 and section.settings.media_size == "small" %} product__info-wrapper--extra-padding{% endif %}">
+    <div class="product__info-wrapper grid__item js-animate slide-right {% if settings.page_width > 1400 and section.settings.media_size == "small" %} product__info-wrapper--extra-padding{% endif %}">
       <div
         id="ProductInfo-{{ section.id }}"
         class="product__info-container{% if section.settings.enable_sticky_info %} product__info-container--sticky{% endif %}"
@@ -324,6 +325,8 @@
                 {{- block.settings.text -}}
               </p>
             {%- when 'title' -%}
+              <div class="yotpo-widget-instance" data-yotpo-instance-id="309391" data-yotpo-product-id="{{ product.id }}"></div>
+
               <div class="product__title" {{ block.shopify_attributes }}>
                 <h1>{{ product.title | escape }}</h1>
                 <a href="{{ product.url }}" class="product__title">
@@ -334,18 +337,8 @@
               </div>
             {%- when 'price' -%}
               <div class="no-js-hidden" id="price-{{ section.id }}" role="status" {{ block.shopify_attributes }}>
-                {%- render 'price', product: product, use_variant: true, show_badges: true, price_class: 'price--large' -%}
+                {%- render 'price', product: product, use_variant: true, price_class: 'price--product' -%}
               </div>
-              {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
-                <div class="product__tax caption rte">
-                  {%- if shop.taxes_included -%}
-                    {{ 'products.product.include_taxes' | t }}
-                  {%- endif -%}
-                  {%- if shop.shipping_policy.body != blank -%}
-                    {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
-                  {%- endif -%}
-                </div>
-              {%- endif -%}
               <div {{ block.shopify_attributes }}>
                 {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                 {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
@@ -355,7 +348,7 @@
               </div>
             {%- when 'description' -%}
               {%- if product.description != blank -%}
-                <div class="product__description rte quick-add-hidden">
+                <div class="product__description quick-add-hidden">
                   {{ product.description }}
                 </div>
               {%- endif -%}
@@ -388,13 +381,14 @@
                   {{ 'products.product.quantity.label' | t }}
                 </label>
 
-                <quantity-input class="quantity">
+                <quantity-input class="quantity quantity--alt">
                   <button class="quantity__button no-js-hidden" name="minus" type="button">
                     <span class="visually-hidden">
                       {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
                     </span>
                     {% render 'icon-minus' %}
                   </button>
+
                   <input
                     class="quantity__input"
                     type="number"
@@ -404,6 +398,7 @@
                     value="1"
                     form="{{ product_form_id }}"
                   >
+
                   <button class="quantity__button no-js-hidden" name="plus" type="button">
                     <span class="visually-hidden">
                       {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
@@ -517,26 +512,24 @@
                         <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
                           {{ option.name }}
                         </label>
-                        <div class="select">
-                          <select
-                            id="Option-{{ section.id }}-{{ forloop.index0 }}"
-                            class="select__select"
-                            name="options[{{ option.name | escape }}]"
-                            form="{{ product_form_id }}"
-                          >
-                            {%- for value in option.values -%}
-                              <option
-                                value="{{ value | escape }}"
-                                {% if option.selected_value == value %}
-                                  selected="selected"
-                                {% endif %}
-                              >
-                                {{ value }}
-                              </option>
-                            {%- endfor -%}
-                          </select>
-                          {% render 'icon-caret' %}
-                        </div>
+
+                        <select
+                          id="Option-{{ section.id }}-{{ forloop.index0 }}"
+                          class="select-alt"
+                          name="options[{{ option.name | escape }}]"
+                          form="{{ product_form_id }}"
+                        >
+                          {%- for value in option.values -%}
+                            <option
+                              value="{{ value | escape }}"
+                              {% if option.selected_value == value %}
+                                selected="selected"
+                              {% endif %}
+                            >
+                              {{ value }}
+                            </option>
+                          {%- endfor -%}
+                        </select>
                       </div>
                     {%- endfor -%}
 
@@ -552,31 +545,29 @@
                   <label class="form__label" for="Variants-{{ section.id }}">
                     {{- 'products.product.product_variants' | t -}}
                   </label>
-                  <div class="select">
-                    <select
-                      name="id"
-                      id="Variants-{{ section.id }}"
-                      class="select__select"
-                      form="{{ product_form_id }}"
-                    >
-                      {%- for variant in product.variants -%}
-                        <option
-                          {% if variant == product.selected_or_first_available_variant %}
-                            selected="selected"
-                          {% endif %}
-                          {% if variant.available == false %}
-                            disabled
-                          {% endif %}
-                          value="{{ variant.id }}"
-                        >
-                          {{ variant.title }}
-                          {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
-                          - {{ variant.price | money | strip_html }}
-                        </option>
-                      {%- endfor -%}
-                    </select>
-                    {% render 'icon-caret' %}
-                  </div>
+
+                  <select
+                    name="id"
+                    id="Variants-{{ section.id }}"
+                    class="select-alt"
+                    form="{{ product_form_id }}"
+                  >
+                    {%- for variant in product.variants -%}
+                      <option
+                        {% if variant == product.selected_or_first_available_variant %}
+                          selected="selected"
+                        {% endif %}
+                        {% if variant.available == false %}
+                          disabled
+                        {% endif %}
+                        value="{{ variant.id }}"
+                      >
+                        {{ variant.title }}
+                        {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                        - {{ variant.price | money | strip_html }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
                 </div>
               </noscript>
             {%- when 'buy_buttons' -%}
@@ -614,6 +605,7 @@
                           disabled
                         {% endif %}
                       >
+                      ⚡
                         <span>
                           {%- if product.selected_or_first_available_variant.available -%}
                             {{ 'products.product.add_to_cart' | t }}
@@ -621,6 +613,7 @@
                             {{ 'products.product.sold_out' | t }}
                           {%- endif -%}
                         </span>
+
                         <div class="loading-overlay__spinner hidden">
                           <svg
                             aria-hidden="true"
@@ -634,6 +627,11 @@
                           </svg>
                         </div>
                       </button>
+
+                      <div class="product-form__message">
+                        {{- 'products.product.note' | t -}} <span class="product-form__message-highlight">{{- 'products.product.note_message' | t -}}</span>
+                      </div><!-- /.product-form__message -->
+
                       {%- if block.settings.show_dynamic_checkout -%}
                         {{ form | payment_button }}
                       {%- endif -%}
@@ -796,7 +794,7 @@
       </div>
     </div>
     {%- if section.settings.media_position == 'right' -%}
-      <div class="grid__item product__media-wrapper small-hide">
+      <div class="grid__item product__media-wrapper small-hide js-animate slide-left">
         <media-gallery
           id="MediaGallery-{{ section.id }}-right"
           role="region"
@@ -1076,6 +1074,8 @@
     </modal-dialog>
   {%- endfor -%}
 
+  <div class="yotpo-widget-instance" data-yotpo-instance-id="309390" data-yotpo-product-id="{{product.id}}" data-yotpo-name="{{ product.title | escape }}" data-yotpo-url="{{ shop.url }}{{ product.url }}" data-yotpo-image-url="{{ product.featured_image | product_img_url: "large" |replace: '?', '%3F' | replace: '&','%26'}}" data-yotpo-description="{{ product.description | escape }}"></div>
+
   {%- if product.media.size > 0 -%}
     <script src="{{ 'product-modal.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'media-gallery.js' | asset_url }}" defer="defer"></script>
@@ -1163,6 +1163,37 @@
       ]
     }
   </script>
+
+  <script>
+    // Change Buy it now button with custom text
+    // Select the node that will be observed for mutations
+    const targetNode = document.querySelector('.product-form');
+    // Options for the observer (which mutations to observe)
+    const config = { attributes: false, childList: true, subtree: true };
+
+    // Callback function to execute when mutations are observed
+    const callback = (mutationList, observer) => {
+      for (const mutation of mutationList) {
+        if (mutation.addedNodes.length > 0 && mutation.addedNodes[0]?.tagName == 'DIV') {
+          const target = mutation.addedNodes[0]?.querySelector('[data-testid="Checkout-button"]');
+          if (target) {
+            target.textContent = '{{ 'products.product.checkout_now' | t }}';
+            setTimeout(() => {
+              target.textContent = '{{ 'products.product.checkout_now' | t }}';
+            }, 100);
+          }
+        }
+      }
+    };
+
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(callback);
+
+    // Start observing the target node for configured mutations
+    observer.observe(targetNode, config);
+  </script>
+
+  <script src="{{ 'animate-elements.js' | asset_url }}" defer="defer"></script>
 </section>
 
 {% schema %}

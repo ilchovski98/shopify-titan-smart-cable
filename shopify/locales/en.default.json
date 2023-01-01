@@ -104,6 +104,10 @@
   },
   "products": {
     "product": {
+      "checkout_now": "👉 Checkout Now",
+      "note": "Note: ",
+      "note_message": "Not Available on Amazon or eBay",
+      "free-delivery": "& Free Delivery",
       "add_to_cart": "Add to cart",
       "choose_options": "Choose options",
       "choose_product_options": "Choose options for {{ product_name }}",
